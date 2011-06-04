@@ -87,6 +87,10 @@ void printIP( uint8_t *buf ) {
 }
 
 void setup(){
+  pinMode(DHCPLED, OUTPUT);
+  // LED off: getting ready
+  digitalWrite(DHCPLED, HIGH);
+  
   Serial.begin(19200);
   Serial.println("Web server test");
 
@@ -139,6 +143,9 @@ void loop(){
   // init the ethernet/ip layer:
   // NOTE: this must happen *AFTER* DHCP, as we only have an IP at this point!
   es.ES_init_ip_arp_udp_tcp(mymac,myip, MYWWWPORT);
+  
+  // LED on: ready to process requests
+  digitalWrite(DHCPLED, LOW);
   
   Serial.println("Waiting for requests...");
 

@@ -102,10 +102,13 @@ void setup(){
 }
 
 void loop(){
+  long firstDhcpRequest = millis();
   long lastDhcpRequest = millis();
   uint8_t dhcpState = 0;
   boolean gotIp = false;
   uint16_t plen, dat_p;
+  long lastLEDTime = millis();
+  int lastLED = HIGH, ledDelay=250;
 
   Serial.println("Sending initial DHCP Discover");
   es.ES_dhcp_start( buf, mymac, myip, mynetmask,gwip, dnsip, dhcpsvrip );
@@ -114,13 +117,23 @@ void loop(){
     // read packet, handle ping and wait for a tcp packet:
     plen = es.ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
     dat_p=es.ES_packetloop_icmp_tcp(buf,plen);
+    
+    // flash LED while acquiring address
+    if (lastLEDTime + ledDelay < millis()) {
+      lastLED = (lastLED == HIGH) ? LOW : HIGH;
+      lastLEDTime = millis();
+      digitalWrite(DHCPLED, lastLED);
+    }
+    if ((firstDhcpRequest + 10000L) < millis()) {
+      ledDelay = 100;
+    }
 
     if(dat_p==0) {
       int retstat = es.ES_check_for_dhcp_answer( buf, plen);
       dhcpState = es.ES_dhcp_state();
       // we are idle here
       if( dhcpState != DHCP_STATE_OK && !gotIp ) {
-        if (millis() > (lastDhcpRequest + 10000L) ){
+        if (millis() > (lastDhcpRequest + 5000L) ){
           lastDhcpRequest = millis();
           // send dhcp
           Serial.println("Sending DHCP Discover");

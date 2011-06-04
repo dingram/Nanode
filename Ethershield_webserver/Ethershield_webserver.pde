@@ -72,7 +72,7 @@ uint16_t print_webpage(uint8_t *buf)
   plen=es.ES_fill_tcp_data(buf,plen,msg);
 
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("</p><hr>"));
-  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<p style=\"text-align: right\">Sketch v1 <a href=\"http://nanode.eu\">nanode.eu</a></p>"));
+  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<p style=\"text-align:right;color:#999\">Sketch v1 <a href=\"http://nanode.eu\">nanode.eu</a></p>"));
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("</body></html>"));
 
   return(plen);

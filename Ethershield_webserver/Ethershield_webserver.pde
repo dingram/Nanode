@@ -18,7 +18,7 @@ static uint8_t dhcpsvrip[4] = { 0,0,0,0 };
 
 #define DHCPLED 6
 #define MYWWWPORT 80
-#define BUFFER_SIZE 750
+#define BUFFER_SIZE 1023
 static uint8_t buf[BUFFER_SIZE+1];
 
 boolean gotIp = false;

@@ -31,11 +31,22 @@ uint16_t http200ok(void)
   return(es.ES_fill_tcp_data_p(buf,0,PSTR("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n")));
 }
 
+void print_mac(uint8_t *buf, uint16_t *plen, uint8_t *mac) {
+  char msg[18] = {0};
+  sprintf(msg, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  *plen=es.ES_fill_tcp_data(buf,*plen,msg);
+}
+
+void print_ip(uint8_t *buf, uint16_t *plen, uint8_t *ip) {
+  char msg[15] = {0};
+  sprintf(msg, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+  *plen=es.ES_fill_tcp_data(buf,*plen,msg);
+}
+
 // prepare the webpage by writing the data to the tcp send buffer
 uint16_t print_webpage(uint8_t *buf)
 {
   uint16_t plen;
-  char msg[18] = {0};
   plen=http200ok();
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<html><head><title>Nanode is alive!</title></head><body>"));
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<center><h1>Congratulations! Your Nanode lives!</h1>"));
@@ -48,28 +59,19 @@ uint16_t print_webpage(uint8_t *buf)
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<p>"));
 
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<strong>MAC:</strong> "));
-  sprintf(msg, "%02x:%02x:%02x:%02x:%02x:%02x", mymac[0], mymac[1], mymac[2], mymac[3], mymac[4], mymac[5]);
-  plen=es.ES_fill_tcp_data(buf,plen,msg);
+  print_mac(buf, &plen, mymac);
 
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br><strong>IP:</strong> "));
-  sprintf(msg, "%d.%d.%d.%d", myip[0], myip[1], myip[2], myip[3]);
-  plen=es.ES_fill_tcp_data(buf,plen,msg);
-
-  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br><strong>Netmask:</strong> "));
-  sprintf(msg, "%d.%d.%d.%d", mynetmask[0], mynetmask[1], mynetmask[2], mynetmask[3]);
-  plen=es.ES_fill_tcp_data(buf,plen,msg);
-
-  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br><strong>Gateway:</strong> "));
-  sprintf(msg, "%d.%d.%d.%d", gwip[0], gwip[1], gwip[2], gwip[3]);
-  plen=es.ES_fill_tcp_data(buf,plen,msg);
-
-  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br><strong>DNS:</strong> "));
-  sprintf(msg, "%d.%d.%d.%d", dnsip[0], dnsip[1], dnsip[2], dnsip[3]);
-  plen=es.ES_fill_tcp_data(buf,plen,msg);
+  print_ip(buf, &plen, myip);
 
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br><strong>DHCP server:</strong> "));
-  sprintf(msg, "%d.%d.%d.%d", dhcpsvrip[0], dhcpsvrip[1], dhcpsvrip[2], dhcpsvrip[3]);
+  print_ip(buf, &plen, dhcpsvrip);
+
+  char msg[15]={0};
+  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<br>"));
+  sprintf(msg, "%lu", millis());
   plen=es.ES_fill_tcp_data(buf,plen,msg);
+  plen=es.ES_fill_tcp_data_p(buf,plen,PSTR(" ms since boot"));
 
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("</p><hr>"));
   plen=es.ES_fill_tcp_data_p(buf,plen,PSTR("<p style=\"text-align:right;color:#999\">Sketch v1 <a href=\"http://nanode.eu\">nanode.eu</a></p>"));

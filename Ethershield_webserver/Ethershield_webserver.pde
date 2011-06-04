@@ -6,7 +6,7 @@
 // two devices:
 // how did I get the mac addr? Translate the first 5 numbers into ASCII gives "NANOD"
 // then use your ID as the last number for uniqueness.
-static uint8_t mymac[6] = { 0x4e,0x40,0x4e,0x4f,0x44,0x00 };
+static uint8_t mymac[6] = { 0x4e,0x41,0x4e,0x4f,0x44,0x00 };
   
 static uint8_t myip[4] = {0,0,0,0};
 static uint8_t mynetmask[4] = { 0,0,0,0 };

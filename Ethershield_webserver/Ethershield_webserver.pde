@@ -160,6 +160,8 @@ void loop(){
   es.ES_init_ip_arp_udp_tcp(mymac,myip, MYWWWPORT);
   
   // LED on: ready to process requests
+  ledDelay = 100;
+  lastLED = LOW;
   digitalWrite(DHCPLED, LOW);
   
   Serial.println("Waiting for requests...");
@@ -169,12 +171,22 @@ void loop(){
     plen = es.ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
     dat_p=es.ES_packetloop_icmp_tcp(buf,plen);
 
+    // turn request LED off after a delay
+    if (lastLED==HIGH && lastLEDTime + ledDelay > millis()) {
+      digitalWrite(DHCPLED, LOW);
+    }
+
     /* dat_p will be unequal to zero if there is a valid 
      * http get */
     if(dat_p==0){
       // no http request
       continue;
     }
+
+    // flash LED while serving request
+    lastLEDTime = millis();
+    lastLED = HIGH;
+    digitalWrite(DHCPLED, HIGH);
 
     Serial.println("Received request");
     // tcp port 80 begin
